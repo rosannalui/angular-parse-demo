@@ -18,6 +18,60 @@ angular.module('ToDoApp', [])
         $httpProvider.defaults.headers.common['X-Parse-REST-API-Key'] = 'VA6eUDFjBo5aKkwVUPzyTG7vXyGVVbK5vcLa89ex';
     })
     .controller('TasksController', function($scope, $http) {
+        $scope.refreshTasks = function() {
+            $scope.loading = true; 
+            $http.get('https://api.parse.com/1/classes/tasks' + '?where={:"done": false}')
+                    //when return a list of data
+                     $scope.tasks = responseData.results; 
+                })
+                    .error(function(err) {
+                        console.log(err); 
+                        //notify the user in some way
+                    })
+                    .finally(function()
+                        $scope.loading = false; 
+                })
+
+        }; //scope.refreshTasks
+
+        $http.get('https://api.parse.com/1/classes/tasks')
+        .success(function(data) {
+           
+        })
+
+        .error(function(err) {
+                console.log(err); 
+            }); 
+        $scope.newTask = { done: false;}
+
+            //function to add a new task to the list
+            $scope.addTask = function(task) {
+
+            //POST will add (insert) a new item to the class
+            $http.post('http://api.parse.com/1/classes/tasks', task)
+                .success(function(responseData) {
+
+                    //Parse.com will return then new objectID in the response data 
+                    //copt that to the task we just inserted
+                    task.objectID = responseData.objectId; 
+
+                    $scope.tasks.push(tasks); 
+                    $scope.newTask = {done: false}; 
+                })
+            }; 
+
+            //function to update an existing task
+            $scope.updateTask = function(task) {
+                $scope.updating = true; 
+                $http.put('http://api.parse.com/1/classes/tasks' + task.objectId, task)
+            }
+            .error(function(err) {
+                console.log(err); 
+                //notify the user in some way
+            })
+        }); 
+
+        
         //this is the base URL for all task objects managed by your application
         //requesting this with a GET will get all tasks objects
         //sending a POST to this will insert a new task object
